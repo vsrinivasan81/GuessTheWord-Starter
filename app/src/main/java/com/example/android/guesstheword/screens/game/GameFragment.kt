@@ -33,31 +33,18 @@ class GameFragment : Fragment() {
                 false
         )
         gameViewModel = ViewModelProvider(this).get(GameViewModel::class.java)
-
-        gameViewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
-            binding.scoreText.text = newScore.toString()
-        })
-
-        gameViewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
-            binding.wordText.text = newWord
-        })
+        binding.gameViewModel = gameViewModel
+        binding.lifecycleOwner = this
 
         gameViewModel.currentTime.observe(viewLifecycleOwner, Observer { newTime ->
             binding.timerText.text = DateUtils.formatElapsedTime(newTime)
         })
 
-        binding.correctButton.setOnClickListener {
-            gameViewModel.onCorrect()
-        }
-
-        binding.skipButton.setOnClickListener {
-            gameViewModel.onSkip()
-        }
-
         gameViewModel.eventGameFinished.observe(viewLifecycleOwner, Observer { hasFinished ->
             if(hasFinished) {
                 val currentScore = gameViewModel.score.value ?: 0
                 val action = GameFragmentDirections.actionGameToScore()
+                action.score = currentScore
                 findNavController(this).navigate(action)
                 gameViewModel.onGameFinishComplete()
             }
